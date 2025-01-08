@@ -1,4 +1,4 @@
-# AirNgin ESP32 MQTT Client v0.0.2 / Arduino.cc Library
+# AirNgin ESP32 MQTT Client v0.0.3 / Arduino.cc Library
 **Arduino Library for Client Connection to the AirNgin Broker**
 
 این کتابخانه آردوینو برای پلتفرم اینترنت اشیا **AirNgin** طراحی و توسعه داده شده است. با استفاده از این کتابخانه که به‌صورت مداوم به‌روزرسانی می‌شود، می‌توانید به‌راحتی و بدون نگرانی به بروکر **AirNgin** متصل شوید.
@@ -62,6 +62,45 @@
 ```cpp
 #define CALL_Global_Mqtt_CALLBACK true
 ---
+
+
+## پیش‌نیازها
+
+کتابخانه **AirNgin ESP32 MQTT Client** برای اجرا نیاز به کتابخانه‌های زیر دارد. برخی از این کتابخانه‌ها به‌صورت پیش‌فرض در Arduino Core برای ESP32 موجود هستند، اما برخی دیگر باید به‌صورت دستی نصب شوند.
+
+### کتابخانه‌های پیش‌فرض (نیازی به نصب دستی ندارند):
+
+1. `Arduino.h`  
+2. `WiFi`  
+3. `EEPROM`  
+4. `SPIFFS`  
+5. `WString`  
+6. `WiFiClientSecure`  
+7. `ESPmDNS`
+
+### کتابخانه‌هایی که باید نصب شوند:
+
+لطفاً پیش از استفاده از کتابخانه، موارد زیر را از **Library Manager** در Arduino IDE نصب کنید:
+
+1. **WebServer**  
+   بخشی از ESP32 Core است، اما اگر نصب نبود، می‌توانید از Library Manager نصب کنید.
+
+2. **PubSubClient**  
+   لینک به مخزن: [PubSubClient](https://github.com/knolleary/pubsubclient)  
+   یا از Library Manager با جستجوی `PubSubClient` نصب کنید.
+
+3. **ArduinoJson**  
+   لینک به مخزن: [ArduinoJson](https://github.com/bblanchon/ArduinoJson)  
+   یا از Library Manager با جستجوی `ArduinoJson` نصب کنید.
+
+4. **HTTPUpdate**  
+   این کتابخانه بخشی از ESP32 Core است. اگر نصب نبود، می‌توانید از Library Manager نصب کنید.
+
+5. **ESPping**  
+   لینک به مخزن: [ESPping](https://github.com/dancol90/ESPping)  
+   یا از Library Manager با جستجوی `ESPping` نصب کنید.
+
+
 
 
 ## **روش‌های نصب کتابخانه**
