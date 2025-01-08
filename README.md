@@ -61,3 +61,42 @@
 
 ```cpp
 #define CALL_Global_Mqtt_CALLBACK true
+
+
+## **روش‌های نصب کتابخانه**
+
+### **روش 1: نصب از طریق Library Manager در Arduino IDE**
+
+1. Arduino IDE را باز کنید.
+2. به منوی **Sketch > Include Library > Manage Libraries...** بروید.
+3. در کادر جستجو، عبارت زیر را وارد کنید:
+AirNgin ESP32 MQTT Client
+
+4. کتابخانه را از لیست نتایج پیدا کرده و روی **Install** کلیک کنید.
+
+---
+
+### **روش 2: نصب دستی از طریق فایل ZIP**
+
+1. به صفحه اصلی مخزن گیت‌هاب کتابخانه بروید:  
+[AirNgin ESP32 MQTT Client](https://github.com/AirNgin/Airngin-esp32-mqtt-client)
+2. روی دکمه **Code** کلیک کرده و گزینه **Download ZIP** را انتخاب کنید.
+3. پس از دانلود، Arduino IDE را باز کرده و به منوی **Sketch > Include Library > Add .ZIP Library...** بروید.
+4. فایل ZIP دانلود شده را انتخاب کنید و روی **Open** کلیک کنید.
+5. کتابخانه به Arduino IDE اضافه می‌شود و می‌توانید از آن استفاده کنید.
+
+---
+
+### **روش 3: نصب دستی از طریق Git**
+
+1. به مسیر کتابخانه‌های Arduino در سیستم خود بروید:
+Documents/Arduino/libraries/
+
+
+2. یک ترمینال یا Command Prompt باز کنید و دستور زیر را اجرا کنید:
+```bash
+git clone https://github.com/AirNgin/Airngin-esp32-mqtt-client.git
+
+Arduino IDE را باز کنید. کتابخانه به‌صورت خودکار شناسایی می‌شود و آماده استفاده خواهد بود.
+
+
