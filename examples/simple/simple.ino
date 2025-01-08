@@ -16,6 +16,16 @@ byte _TimerSecDef = 0;
 
 byte _TimerKeyPush = 0;
 
+
+
+void MqttSend(String topic, String data){
+
+  airnginClient.Mqtt_Send(topic, data);
+
+}
+
+
+
 void setup() {
 
   Serial.begin(9600);
@@ -153,3 +163,6 @@ void message_From_Topic_DeviceToDevice_Callback(uint8_t *payload) {
 void message_From_Topic_ServerToDevice_Callback(String value) {
     Serial.println("message on ServerToDevice Callback with value: " + value);
 }
+
+
+//Mqtt_Send(String topic, String data);

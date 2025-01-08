@@ -376,8 +376,8 @@ public:
     void begin(String name_of_brand="", String version_of_brand="", String serial_of_device="");
     void Config__Setup();
     void client_Loop();
-    void Mqtt_Send(String scope, String type, String data, String sender, bool offlineSupport);
-    void Mqtt_Send(String topic, String data, bool offlineSupport);
+    void Mqtt_Send(String scope, String type, String data, String sender, bool offlineSupport=false);
+    void Mqtt_Send(String topic, String data, bool offlineSupport=false);
     void MessageCloud__ViaMqtt_NotifyTo_User(int messageCode);
     void MessageCloud__ViaMqtt_NotifyTo_User(String &messageCode);
     void MessageCloud__ViaMqtt_SMSTo_User(int messageCode);
