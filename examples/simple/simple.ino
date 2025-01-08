@@ -2,7 +2,7 @@
 
 #define KEY_OF_CENTER "AIRN" // IT'S PRODUCER CENTER CODE
 
-#define Pushbotton 32 // PIN FOR GO TO Config Panel and AP MODE
+#define Pushbotton 23 // PIN FOR GO TO Config Panel and AP MODE
 
 #define CALL_Global_Mqtt_CALLBACK true // if is true just call this airnginClient.setOnMessageCallback(myMqttCallback);
                                        // else is false desn't call airnginClient.setOnMessageCallback(myMqttCallback); and call other callback
@@ -26,9 +26,6 @@ void setup() {
   airnginClient.setOnDebuggerCallback(debuggerCallback);
   airnginClient.setOnMessage_From_Topic_DeviceToDevice_Callback(message_From_Topic_DeviceToDevice_Callback);
   airnginClient.setOnMessage_From_Topic_ServerToDevice_Callback(message_From_Topic_ServerToDevice_Callback);
-
-  Serial.println("*-*-*-*-*-before confige **********************************");
-  Serial.println("*-*-*-*-*-before confige  *********************************");
   
   pinMode(Pushbotton, INPUT_PULLUP);
 }
