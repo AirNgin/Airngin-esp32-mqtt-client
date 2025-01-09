@@ -1,6 +1,6 @@
 /*
  airngin.h - A simple client for Connect To AirNgin Broker.
-  AirNgin VERSION : 0.1.1 Beta
+  AirNgin VERSION : 0.1.0 Beta
   https://airngin.com
 */
 #ifndef airngin_h

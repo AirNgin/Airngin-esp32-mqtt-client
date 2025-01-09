@@ -12,7 +12,6 @@ AirNginClient* AirNginClient::instance = nullptr;
 
 
 AirNginClient::AirNginClient():_MqttObj(_WifiClient), _Reboot(false),_TimerMqttLoopPrev(0) ,_Server(80),_MqttCon_Steps(0) {
-  instance = this;
 }
 
 
@@ -20,8 +19,8 @@ AirNginClient::AirNginClient():_MqttObj(_WifiClient), _Reboot(false),_TimerMqttL
 
 void AirNginClient::begin(String name_of_brand, String brand_version, String serial_of_device) {
 
-
-    //-------------------------------------------------------- Preparing EEPROM & File
+  instance = this;
+  //-------------------------------------------------------- Preparing EEPROM & File
   EEPROM_Start();
   SPIFFS_Start();
 
