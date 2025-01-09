@@ -1,4 +1,4 @@
-# AirNgin ESP32 MQTT Client v0.0.3 / Arduino.cc Library
+# AirNgin ESP32 MQTT Client v0.1.0 / Arduino.cc Library
 **Arduino Library for Client Connection to the AirNgin Broker**
 
 این کتابخانه آردوینو برای پلتفرم اینترنت اشیا **AirNgin** طراحی و توسعه داده شده است. با استفاده از این کتابخانه که به‌صورت مداوم به‌روزرسانی می‌شود، می‌توانید به‌راحتی و بدون نگرانی به بروکر **AirNgin** متصل شوید.
