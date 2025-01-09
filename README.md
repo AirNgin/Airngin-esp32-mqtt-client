@@ -59,8 +59,9 @@
 ### فعال‌سازی Callback سراسری
 اگر متغیر سراسری زیر را **`true`** کنید، تنها یک Callback عمومی به نام `myMqttCallback` فعال می‌شود:
 
-```cpp
+
 #define CALL_Global_Mqtt_CALLBACK true
+
 ---
 
 
@@ -136,6 +137,7 @@ Documents/Arduino/libraries/
 2. یک ترمینال یا Command Prompt باز کنید و دستور زیر را اجرا کنید:
 ```bash
 git clone https://github.com/AirNgin/Airngin-esp32-mqtt-client.git
+```
 
 Arduino IDE را باز کنید. کتابخانه به‌صورت خودکار شناسایی می‌شود و آماده استفاده خواهد بود.
 
