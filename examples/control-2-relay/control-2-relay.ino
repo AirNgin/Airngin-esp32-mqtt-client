@@ -52,7 +52,7 @@ void loop() {
   delay(1000);
   airnginClient.client_Loop();
   TimerSec_Refresh();  //read Time
-  if (digitalRead(Pushbutton_RELAY1) == LOW) {
+  if (digitalRead(Pushbotton) == LOW) {
     _TimerKeyPush += _TimerSecDef;
   } else
     _TimerKeyPush = 0;
