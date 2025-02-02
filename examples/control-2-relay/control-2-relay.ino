@@ -1,5 +1,7 @@
 #include <AirNgin.h>
 
+
+
 #define KEY_OF_CENTER "AIRN"  // IT'S PRODUCER CENTER CODE
 
 #define Pushbotton 23  // PIN FOR GO TO Config Panel and AP MODE
@@ -12,6 +14,7 @@
 #define CALL_Global_Mqtt_CALLBACK true  // if is true just call this airnginClient.setOnMessageCallback(myMqttCallback); \
                                         // else is false desn't call airnginClient.setOnMessageCallback(myMqttCallback); and call other callback
 
+
 AirNginClient airnginClient;
 
 String _SerialNo = "";
@@ -23,6 +26,8 @@ byte _TimerKeyPush = 0;
 
 void MqttSend(String topic, String data) {
 
+  Serial.println("MqttSend : >> topic >> " + topic + " ::: data >> " + data);
+
   airnginClient.Mqtt_Send(topic, data);
 }
 
@@ -32,7 +37,7 @@ void setup() {
 
   Serial.begin(9600);
   Tools__SerialBarcodeReload();
-  airnginClient.begin("", "", _SerialNo);
+  airnginClient.begin("", "1.0.0", _SerialNo);
   airnginClient.setOnMessageCallback(myMqttCallback);
   airnginClient.setOnSaveScenarioCallback(saveScenarioCallback);
   airnginClient.setOnDebuggerCallback(debuggerCallback);
@@ -52,7 +57,7 @@ void loop() {
   delay(1000);
   airnginClient.client_Loop();
   TimerSec_Refresh();  //read Time
-  if (digitalRead(Pushbotton) == LOW) {
+  if (digitalRead(Pushbutton_RELAY1) == LOW) {
     _TimerKeyPush += _TimerSecDef;
   } else
     _TimerKeyPush = 0;
@@ -126,8 +131,9 @@ void TimerSec_Refresh() {
 
 void myMqttCallback(char *topic, uint8_t *payload, unsigned int length) {
 
-  Serial.print("Received data from topic: ");
-  Serial.println(topic);
+
+  Serial.print("Received data length: ");
+  Serial.println(String(length));
 
   Serial.print("Data: ");
   for (unsigned int i = 0; i < length; i++) {
@@ -146,6 +152,10 @@ void myMqttCallback(char *topic, uint8_t *payload, unsigned int length) {
   doc.clear();
 
   DeserializationError error = deserializeJson(doc, payload, length);
+
+  Serial.print("Received data from topic: ");
+  Serial.println(topic);
+
   if (error) {
     Serial.println("JSON parse failed!");
     return;
@@ -171,34 +181,54 @@ void myMqttCallback(char *topic, uint8_t *payload, unsigned int length) {
         }
       }
     }
-  } else if (projectTopic == "ServerToDevice") { // اگر داده ارسالی از سمت سرور باشد
-    
-    // خروجی ما بصورت زیر است 
+  } else if (projectTopic == "ServerToDevice") {  // اگر داده ارسالی از سمت سرور باشد
+
+    // خروجی ما بصورت زیر است
     //{"data":"{\"type\":\"command\",\"value\":\"ch2on\"}","deviceSerial":"AIRN0001208520"}
-    // دقت نمایید همیشه خروجی شما از طریق js generate 
-    // درون یک json بصورت بالا 
+    // دقت نمایید همیشه خروجی شما از طریق js generate
+    // درون یک json بصورت بالا
     // در کلید data
     // قرار می گیرد
 
     // اسختراج سریال ابزاری که سرور برای آن داده را ارسال کرده ، جهت اینکه بدانید برای کدام ابزار است و با سریال خودتان در ادامه قیاس نمایید.
     String deviceSerial = doc["deviceSerial"].as<String>();
+    String cmd = "";
 
-    if ((doc["data"])) {
+    if (doc["operationName"]) cmd = doc["operationName"].as<String>();
 
-        if (deviceSerial == airnginClient._SerialCloud) { // مطمین شویم که این داده برای ما ارسال شده است.
+    if (cmd == "firmware_update") {
 
-      String cmd = doc["data"].as<String>(); // اگر دیتا داشت چون خروجی فایل جاوااسکریپت ما هم یک json بوده 
-                                           // تشکیل یک json در json داده ایم
-                                           // پس نیاز است ابتدا json خودمان را
-                                           // از json درون data
-                                           // استخراج نماییم و سپس json خودمان را
-      if (cmd != "") {
+      String value = doc["value"].as<String>();
+      if (value != "") {
+        doc.clear();
+        deserializeJson(doc, value);
+        Serial.println(" link > " + doc["link"].as<String>());
+        Serial.println(" cert > " + doc["cert"].as<String>());
+        Serial.println(" utc > " + doc["utc"].as<String>());
+        airnginClient.IOT__FirmwareUpdate(doc["link"].as<String>(), doc["cert"].as<String>(), doc["utc"].as<String>());
+      }
+    }  // پس نیاز است ابتدا json خودمان را
+       // از json درون data
+       // استخراج نماییم و سپس json خودمان را
+
+    else if ((doc["data"])) {
+
+      if (deviceSerial == airnginClient._SerialCloud) {  // مطمین شویم که این داده برای ما ارسال شده است.
+
+        cmd = doc["data"].as<String>();  // اگر دیتا داشت چون خروجی فایل جاوااسکریپت ما هم یک json بوده
+                                         // تشکیل یک json در json داده ایم
+        if (cmd != "") {
+
+
           doc.clear();
           deserializeJson(doc, cmd);
           String type = doc["type"].as<String>();
           String value = doc["value"].as<String>();
+          if (doc["operationName"]) cmd = doc["operationName"].as<String>();
+
           Serial.println(" type > " + type);
           Serial.println(" value > " + value);
+          Serial.println(" cmd > " + cmd);
 
           if (type == "command") {
             if (value == "ch1on") {
@@ -217,7 +247,7 @@ void myMqttCallback(char *topic, uint8_t *payload, unsigned int length) {
               digitalWrite(RELAY2, LOW);
               Serial.println(" with command from server  >  Relay 2 : OFF");
             }
-              MqttSend("DeviceToServer", value); // حتما تغییرات را برای ثبت در سرور و ایجاد تغییر در اپلیکیشن ها به سمت سرور ارسال می نماییم.
+            MqttSend("DeviceToServer", value);  // حتما تغییرات را برای ثبت در سرور و ایجاد تغییر در اپلیکیشن ها به سمت سرور ارسال می نماییم.
           }
         }
       }

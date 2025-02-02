@@ -17,7 +17,7 @@ AirNginClient::AirNginClient():_MqttObj(_WifiClient), _Reboot(false),_TimerMqttL
 
 
 
-void AirNginClient::begin(String name_of_brand, String brand_version, String serial_of_device) {
+void AirNginClient::begin(String _name_of_brand, String _brand_version, String _serial_of_device) {
 
   instance = this;
   //-------------------------------------------------------- Preparing EEPROM & File
@@ -26,22 +26,31 @@ void AirNginClient::begin(String name_of_brand, String brand_version, String ser
 
   Tools__SettingRead();
   Tools__SettingShowInfo();
-  if(name_of_brand != ""){
-    brand_name = name_of_brand;
+  _MqttObj.setBufferSize(4096);
+  if(_name_of_brand != ""){
+    brand_name = _name_of_brand;
   }
 
-  if(brand_version != ""){
-    brand_version = brand_version;
+  if(_brand_version != ""){
+    brand_version = _brand_version;
   }
 
+
+  DEBUG_SERIAL_PRINTLN("brand_version :: >> " + brand_version);
+  DEBUG_SERIAL_PRINTLN("brand_name :: >> " + brand_name);
   
-  if(serial_of_device != ""){
-    _SerialCloud = serial_of_device;
+  if(_serial_of_device != ""){
+    _SerialCloud = _serial_of_device;
   }else{
     DEBUG_SERIAL_PRINTLN("Serial Can't Empty");
     return;
   }
 
+
+  DEBUG_SERIAL_PRINTLN("brand_version :: >> " + brand_version);
+  DEBUG_SERIAL_PRINTLN("brand_name :: >> " + brand_name);
+  DEBUG_SERIAL_PRINTLN("_SerialCloud :: >> " + _SerialCloud);
+  
  
 
   DEBUG_SERIAL_PRINTLN(".... IOT Setup START ...");
