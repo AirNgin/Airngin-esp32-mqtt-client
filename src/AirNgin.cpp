@@ -419,12 +419,15 @@ void AirNginClient::Mqtt__Connect()
 
 void AirNginClient::Mqtt__OnRecieve(char *topic, uint8_t *payload, unsigned int length)
 {
-  if(CALL_Global_Mqtt_CALLBACK){
+  if(instance->CALL_Global_Mqtt_CALLBACK){
+    instance->DEBUG_SERIAL_PRINTLN("CALL_Global_Mqtt_CALLBACK is true");
     if (instance->onMessageCallback != nullptr) {
       instance->onMessageCallback(topic, payload, length);  // فراخوانی callback ثبت‌شده توسط کاربر
     }
     return;
   }
+    instance->DEBUG_SERIAL_PRINTLN("CALL_Global_Mqtt_CALLBACK is false");
+
 
     String projectTopic = String(topic);
     int p = projectTopic.indexOf('/');
@@ -2568,8 +2571,183 @@ void AirNginClient::TimerSec_Refresh()
   }
 }
 
+const String serverURL = "https://app.airngin.com/api/v1.0/DeviceCloud/";
+#include <ArduinoJson.h>  // برای پردازش JSON
 
+bool AirNginClient::addDataToCloud(String key, String value) {
+  if (WiFi.status() == WL_CONNECTED) {
 
+    // بررسی اینکه هیچ‌یک از مقادیر ورودی خالی نباشد
+    if (String(instance->_MqttUser).isEmpty() || 
+        String(instance->_MqttPass).isEmpty() ||
+        String(instance->_SerialCloud).isEmpty() ||
+        String(instance->_ProjectCode).isEmpty() ||
+        key.isEmpty()) {
+      DEBUG_SERIAL_PRINTLN("Error: One or more required parameters are empty!");
+      return "";  // مقدار خالی برگردانده می‌شود
+    }
+    
+    HTTPClient http;
+    http.begin(serverURL + "AddNewData");
+    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    // ساخت داده ارسالی
+    String requestBody = "Username=" + String(instance->_MqttUser) +
+                         "&Password=" + String(instance->_MqttPass) +
+                         "&DeviceSerial=" + String(instance->_SerialCloud) +
+                         "&ProjectCode=" + String(instance->_ProjectCode) +
+                         "&Key=" + key +
+                         "&Value=" + value;
+
+    int httpResponseCode = http.POST(requestBody);
+    String response = "";
+
+    if (httpResponseCode > 0) {
+      response = http.getString();
+      DEBUG_SERIAL_PRINTLN("Response: " + response);
+
+      // پردازش JSON برای بررسی مقدار `isSuccess`
+      StaticJsonDocument<512> jsonDoc;  
+      DeserializationError error = deserializeJson(jsonDoc, response);
+
+      if (!error) {
+        bool isSuccess = jsonDoc["isSuccess"];
+        if (isSuccess) {
+          return true;
+        } else {
+          DEBUG_SERIAL_PRINTLN("Error: Operation failed!");
+          DEBUG_SERIAL_PRINTLN("Response: " + response);
+
+          return false;  // در صورت ناموفق بودن مقدار خالی برمی‌گرداند
+        }
+      } else {
+        DEBUG_SERIAL_PRINTLN("Error: Failed to parse JSON!");
+        return false;
+      }
+    } else {
+      DEBUG_SERIAL_PRINTLN("Error sending request");
+      return false;
+    }
+
+    http.end();
+  }
+  
+  return "";  // مقدار خالی در صورتی که WiFi قطع باشد
+}
+
+String AirNginClient::getDataFromCloud(String key) {
+  if (WiFi.status() == WL_CONNECTED) {
+
+    // بررسی اینکه هیچ‌یک از مقادیر ورودی خالی نباشد
+    if (String(instance->_MqttUser).isEmpty() || 
+        String(instance->_MqttPass).isEmpty() ||
+        String(instance->_SerialCloud).isEmpty() ||
+        String(instance->_ProjectCode).isEmpty() ||
+        key.isEmpty()) {
+      DEBUG_SERIAL_PRINTLN("Error: One or more required parameters are empty!");
+      return "";
+    }
+
+    HTTPClient http;
+    
+    // ارسال پارامترها در QueryString و نه در Body
+    String requestURL = serverURL + "GetDeviceCloud?"
+                        "Username=" + String(instance->_MqttUser) +
+                        "&Password=" + String(instance->_MqttPass) +
+                        "&DeviceSerial=" + String(instance->_SerialCloud) +
+                        "&ProjectCode=" + String(instance->_ProjectCode) +
+                        "&Key=" + key;
+
+    http.begin(requestURL);
+    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    // ارسال درخواست POST بدون body، زیرا داده‌ها در QueryString هستند
+    int httpResponseCode = http.POST("");
+    String receivedValue = ""; // مقدار بازگشتی
+
+    if (httpResponseCode > 0) {
+      String response = http.getString();
+      DEBUG_SERIAL_PRINTLN("Received Data: " + response);
+
+      // **تجزیه‌ی JSON برای استخراج `isSuccess` و `data.value`**
+      StaticJsonDocument<512> jsonDoc;
+      DeserializationError error = deserializeJson(jsonDoc, response);
+
+      if (!error) {
+        bool isSuccess = jsonDoc["isSuccess"];
+        if (isSuccess) {
+          receivedValue = jsonDoc["data"]["value"].as<String>(); // مقدار دریافت‌شده را دریافت کن
+          DEBUG_SERIAL_PRINTLN("Data Retrieved Successfully: " + receivedValue);
+        } else {
+          DEBUG_SERIAL_PRINTLN("Error: Operation was not successful");
+        }
+      } else {
+        DEBUG_SERIAL_PRINTLN("JSON Parsing Error");
+      }
+    } else {
+      DEBUG_SERIAL_PRINTLN("Error receiving data");
+    }
+
+    http.end();
+    return receivedValue; // مقدار دریافت‌شده را برمی‌گرداند
+  }
+  return "";
+}
+
+#include <ArduinoJson.h>
+
+bool AirNginClient::deleteDataFromCloud(String key) {
+  if (WiFi.status() == WL_CONNECTED) {
+
+    // بررسی اینکه هیچ‌یک از مقادیر ورودی خالی نباشد
+    if (String(instance->_MqttUser).isEmpty() || 
+        String(instance->_MqttPass).isEmpty() ||
+        String(instance->_SerialCloud).isEmpty() ||
+        String(instance->_ProjectCode).isEmpty() ||
+        key.isEmpty()) {
+      DEBUG_SERIAL_PRINTLN("Error: One or more required parameters are empty!");
+      return false;
+    }
+
+    HTTPClient http;
+
+    // ساخت URL برای حذف داده
+    String requestURL = serverURL + "DeleteData?"
+                        "Username=" + String(instance->_MqttUser) +
+                        "&Password=" + String(instance->_MqttPass) +
+                        "&DeviceSerial=" + String(instance->_SerialCloud) +
+                        "&ProjectCode=" + String(instance->_ProjectCode) +
+                        "&Key=" + key;
+
+    http.begin(requestURL);
+    
+    // در صورتی که `sendRequest("DELETE")` مشکل داشت، از `GET` استفاده کنید
+    int httpResponseCode = http.sendRequest("DELETE"); // در صورت خطا، می‌توان از http.GET() استفاده کرد.
+
+    bool isSuccess = false;
+
+    if (httpResponseCode > 0) {
+      String response = http.getString();
+      DEBUG_SERIAL_PRINTLN("Delete Response: " + response);
+
+      // **تجزیه‌ی JSON برای استخراج `isSuccess`**
+      StaticJsonDocument<512> jsonDoc;
+      DeserializationError error = deserializeJson(jsonDoc, response);
+
+      if (!error) {
+        isSuccess = jsonDoc["isSuccess"];
+      } else {
+        DEBUG_SERIAL_PRINTLN("JSON Parsing Error");
+      }
+    } else {
+      DEBUG_SERIAL_PRINTLN("Error deleting data");
+    }
+
+    http.end();
+    return isSuccess; // برگرداندن مقدار true در صورت موفقیت، false در غیر این صورت
+  }
+  return false;
+}
 
 
 

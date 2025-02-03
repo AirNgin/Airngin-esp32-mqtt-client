@@ -4,9 +4,6 @@
 
 #define Pushbotton 23  // PIN FOR GO TO Config Panel and AP MODE
 
-#define CALL_Global_Mqtt_CALLBACK true  // if is true just call this airnginClient.setOnMessageCallback(myMqttCallback); \
-                                        // else is false desn't call airnginClient.setOnMessageCallback(myMqttCallback); and call other callback
-
 AirNginClient airnginClient;
 
 String _SerialNo = "";
@@ -26,6 +23,9 @@ void MqttSend(String topic, String data) {
 
 
 void setup() {
+
+  airnginClient.CALL_Global_Mqtt_CALLBACK=false; // if is true just call this airnginClient.setOnMessageCallback(myMqttCallback); \
+                                                 // else is false desn't call airnginClient.setOnMessageCallback(myMqttCallback); and call other callback
 
   Serial.begin(9600);
   Tools__SerialBarcodeReload();

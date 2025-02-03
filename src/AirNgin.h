@@ -23,7 +23,8 @@
 
 #define DVC_DEFAULTPASS "00000000"  // DONT CHANGE THIS
 #define SOFTWARE_DATE "1403.09.25"
-#define CALL_Global_Mqtt_CALLBACK true
+
+
 
 #include <Arduino.h>
 #include <WiFi.h>
@@ -209,9 +210,7 @@ class AirNginClient{
 
 private:
 
-    bool _WiFi_IsConnected;
-    bool _WiFi_ConnectWorking;
-    bool _MqttCon_IsConnected;
+
     byte _MqttCon_Steps;
     int _IOT_ModemTimeout = MIN_3;
     int _IOT_MqttTimeout = TIMER_NEED_RUN;
@@ -372,7 +371,9 @@ public:
 
 
     AirNginClient();
-
+    bool addDataToCloud(String key, String value);
+    String getDataFromCloud(String key);
+    bool deleteDataFromCloud(String key);
     void begin(String name_of_brand="", String version_of_brand="", String serial_of_device="");
     void Config__Setup();
     void client_Loop();
@@ -441,6 +442,10 @@ public:
     static const byte maxPROGMEM_CSS;
     static const byte maxPROGMEM_HTML;
     bool isConfigMode = false;
+    bool _WiFi_IsConnected;
+    bool _WiFi_ConnectWorking;
+    bool _MqttCon_IsConnected;
+    bool CALL_Global_Mqtt_CALLBACK=false;
 
 
 };

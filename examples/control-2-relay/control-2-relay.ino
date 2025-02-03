@@ -11,8 +11,6 @@
 #define Pushbutton_RELAY1 32  // push botton RELAY ONE
 #define Pushbutton_RELAY2 33  // push botton RELAY TWO
 
-#define CALL_Global_Mqtt_CALLBACK true  // if is true just call this airnginClient.setOnMessageCallback(myMqttCallback); \
-                                        // else is false desn't call airnginClient.setOnMessageCallback(myMqttCallback); and call other callback
 
 
 AirNginClient airnginClient;
@@ -34,6 +32,11 @@ void MqttSend(String topic, String data) {
 
 
 void setup() {
+
+  airnginClient.CALL_Global_Mqtt_CALLBACK=false; // if is true just call this airnginClient.setOnMessageCallback(myMqttCallback); \
+                                                 // else is false desn't call airnginClient.setOnMessageCallback(myMqttCallback); and call other callback
+
+
 
   Serial.begin(9600);
   Tools__SerialBarcodeReload();
