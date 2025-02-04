@@ -1,7 +1,5 @@
 #include <AirNgin.h>
 
-
-
 #define KEY_OF_CENTER "AIRN"  // IT'S PRODUCER CENTER CODE
 
 #define Pushbotton 23  // PIN FOR GO TO Config Panel and AP MODE
