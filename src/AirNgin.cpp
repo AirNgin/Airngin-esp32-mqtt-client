@@ -94,7 +94,7 @@ void AirNginClient::EEPROM_Start(){
   if (!EEPROM.begin(EEPROM_SIZE)) {
     byte fail = 0;
     while (!EEPROM.begin(EEPROM_SIZE)) {
-      instance->DEBUG_SERIAL_PRINTLN("EEPROM Failed to init: " + String(fail));
+      DEBUG_SERIAL_PRINTLN("EEPROM Failed to init: " + String(fail));
       delay(2000);
       if (++fail > 5) {
 #if SOFTWARE_DEBUGMODE
@@ -108,7 +108,7 @@ void AirNginClient::EEPROM_Start(){
       }
     }
   }
-  instance->DEBUG_SERIAL_PRINTLN("EEPROM Size OK (" + String((byte)(100 * EP_MEMORYEND2 / EEPROM_SIZE)) + "\% Used / " + String(EP_MEMORYEND2 + 2) + " of " + String(EEPROM_SIZE) + " Bytes)");
+  DEBUG_SERIAL_PRINTLN("EEPROM Size OK (" + String((byte)(100 * EP_MEMORYEND2 / EEPROM_SIZE)) + "\% Used / " + String(EP_MEMORYEND2 + 2) + " of " + String(EEPROM_SIZE) + " Bytes)");
   if (EP_MEMORYEND2 + 2 >= EEPROM_SIZE) {
 #if SOFTWARE_DEBUGMODE
 #else
@@ -146,7 +146,7 @@ void AirNginClient::SPIFFS_Start(){
       delay(100);
     }
   }
-  instance->DEBUG_SERIAL_PRINTLN("FILES Space OK (" + String((byte)(100 * SPIFFS.usedBytes() / SPIFFS.totalBytes())) + "\% Used / " + String(SPIFFS.usedBytes()/1024) + " of " + String(SPIFFS.totalBytes()/1024) + " Kb)\r\n");
+  DEBUG_SERIAL_PRINTLN("FILES Space OK (" + String((byte)(100 * SPIFFS.usedBytes() / SPIFFS.totalBytes())) + "\% Used / " + String(SPIFFS.usedBytes()/1024) + " of " + String(SPIFFS.totalBytes()/1024) + " Kb)\r\n");
 }
 
 
@@ -267,7 +267,7 @@ void AirNginClient::IOT__Checker(void *param)
                 if (instance->_IOT_ModemTimeout == TIMER_JOB_DONE)
                     instance->_IOT_ModemTimeout = MIN_3;
                 instance->IOT__WiFiStart();
-                instance->DEBUG_SERIAL_PRINTLN("############ _MqttCon_Steps 0 :: WiFiStart()");
+                DEBUG_SERIAL_PRINTLN("############ _MqttCon_Steps 0 :: WiFiStart()");
                 if (instance->_MqttCon_Steps == 0)
                     instance->_MqttCon_Steps = 1;
             }
@@ -281,17 +281,17 @@ void AirNginClient::IOT__Checker(void *param)
                 instance->_MqttObj.setSocketTimeout(15);
                 instance->_MqttObj.setKeepAlive(15);
                 instance->_MqttCon_Steps = 3;
-                instance->DEBUG_SERIAL_PRINTLN("############ _MqttCon_Steps 1 :: MqttObj.setServer()");
+                DEBUG_SERIAL_PRINTLN("############ _MqttCon_Steps 1 :: MqttObj.setServer()");
             }
             else if (instance->_MqttCon_Steps == 3)
             {
-                // instance->DEBUG_SERIAL_PRINTLN("############ _MqttCon_Steps 3 :: call Mqtt__Connect()");
+                // DEBUG_SERIAL_PRINTLN("############ _MqttCon_Steps 3 :: call Mqtt__Connect()");
                 delay(1000);
                 instance->Mqtt__Connect();
             }
             else
             {
-                instance->DEBUG_SERIAL_PRINTLN("############ _MqttCon_Steps " + String(instance->_MqttCon_Steps) + " :: No Action");
+                DEBUG_SERIAL_PRINTLN("############ _MqttCon_Steps " + String(instance->_MqttCon_Steps) + " :: No Action");
             }
          }
 
@@ -308,47 +308,47 @@ void AirNginClient::IOT__WiFiEvent(WiFiEvent_t event)
             return;
 
     switch (event) {
-    case ARDUINO_EVENT_WIFI_READY:               instance->DEBUG_SERIAL_PRINTLN("WiFi interface ready"); break;
-    case ARDUINO_EVENT_WIFI_SCAN_DONE:           instance->DEBUG_SERIAL_PRINTLN("Completed scan for access points"); break;
-    case ARDUINO_EVENT_WIFI_STA_START:           instance->DEBUG_SERIAL_PRINTLN("WiFi client started"); break;
-    case ARDUINO_EVENT_WIFI_STA_STOP:            instance->DEBUG_SERIAL_PRINTLN("WiFi clients stopped"); break;
-    case ARDUINO_EVENT_WIFI_STA_CONNECTED:       instance->DEBUG_SERIAL_PRINTLN("Connected to access point"); break;
+    case ARDUINO_EVENT_WIFI_READY:               DEBUG_SERIAL_PRINTLN("WiFi interface ready"); break;
+    case ARDUINO_EVENT_WIFI_SCAN_DONE:           DEBUG_SERIAL_PRINTLN("Completed scan for access points"); break;
+    case ARDUINO_EVENT_WIFI_STA_START:           DEBUG_SERIAL_PRINTLN("WiFi client started"); break;
+    case ARDUINO_EVENT_WIFI_STA_STOP:            DEBUG_SERIAL_PRINTLN("WiFi clients stopped"); break;
+    case ARDUINO_EVENT_WIFI_STA_CONNECTED:       DEBUG_SERIAL_PRINTLN("Connected to access point"); break;
     case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
-        instance->DEBUG_SERIAL_PRINTLN("Disconnected from WiFi access point");
+        DEBUG_SERIAL_PRINTLN("Disconnected from WiFi access point");
         instance->_WiFi_IsConnected = false;
         instance->_MqttCon_IsConnected = false;
         instance->_MqttCon_Steps = 0;
-        instance->DEBUG_SERIAL_PRINTLN("WiFi lost connection");
+        DEBUG_SERIAL_PRINTLN("WiFi lost connection");
         
          break;
-    case ARDUINO_EVENT_WIFI_STA_AUTHMODE_CHANGE: instance->DEBUG_SERIAL_PRINTLN("Authentication mode of access point has changed"); break;
+    case ARDUINO_EVENT_WIFI_STA_AUTHMODE_CHANGE: DEBUG_SERIAL_PRINTLN("Authentication mode of access point has changed"); break;
     case ARDUINO_EVENT_WIFI_STA_GOT_IP:
-         instance->DEBUG_SERIAL_PRINTLN("WiFi connected, IP: " + WiFi.localIP().toString());
+         DEBUG_SERIAL_PRINTLN("WiFi connected, IP: " + WiFi.localIP().toString());
          instance->_WiFi_IsConnected = true;
          instance->_IOT_MqttTimeout = TIMER_NEED_RUN;
          instance->_MqttCon_Steps = 2;
-      instance->DEBUG_SERIAL_PRINTLN("Obtained IP address: ");
-      instance->DEBUG_SERIAL_PRINTLN(String(WiFi.localIP()));
+      DEBUG_SERIAL_PRINTLN("Obtained IP address: ");
+      DEBUG_SERIAL_PRINTLN(String(WiFi.localIP()));
       break;
-    case ARDUINO_EVENT_WIFI_STA_LOST_IP:        instance->DEBUG_SERIAL_PRINTLN("Lost IP address and IP address is reset to 0"); break;
-    case ARDUINO_EVENT_WPS_ER_SUCCESS:          instance->DEBUG_SERIAL_PRINTLN("WiFi Protected Setup (WPS): succeeded in enrollee mode"); break;
-    case ARDUINO_EVENT_WPS_ER_FAILED:           instance->DEBUG_SERIAL_PRINTLN("WiFi Protected Setup (WPS): failed in enrollee mode"); break;
-    case ARDUINO_EVENT_WPS_ER_TIMEOUT:          instance->DEBUG_SERIAL_PRINTLN("WiFi Protected Setup (WPS): timeout in enrollee mode"); break;
-    case ARDUINO_EVENT_WPS_ER_PIN:              instance->DEBUG_SERIAL_PRINTLN("WiFi Protected Setup (WPS): pin code in enrollee mode"); break;
-    case ARDUINO_EVENT_WIFI_AP_START:           instance->DEBUG_SERIAL_PRINTLN("WiFi access point started"); break;
-    case ARDUINO_EVENT_WIFI_AP_STOP:            instance->DEBUG_SERIAL_PRINTLN("WiFi access point  stopped"); break;
-    case ARDUINO_EVENT_WIFI_AP_STACONNECTED:    instance->DEBUG_SERIAL_PRINTLN("Client connected"); break;
-    case ARDUINO_EVENT_WIFI_AP_STADISCONNECTED: instance->DEBUG_SERIAL_PRINTLN("Client disconnected"); break;
-    case ARDUINO_EVENT_WIFI_AP_STAIPASSIGNED:   instance->DEBUG_SERIAL_PRINTLN("Assigned IP address to client"); break;
-    case ARDUINO_EVENT_WIFI_AP_PROBEREQRECVED:  instance->DEBUG_SERIAL_PRINTLN("Received probe request"); break;
-    case ARDUINO_EVENT_WIFI_AP_GOT_IP6:         instance->DEBUG_SERIAL_PRINTLN("AP IPv6 is preferred"); break;
-    case ARDUINO_EVENT_WIFI_STA_GOT_IP6:        instance->DEBUG_SERIAL_PRINTLN("STA IPv6 is preferred"); break;
-    case ARDUINO_EVENT_ETH_GOT_IP6:             instance->DEBUG_SERIAL_PRINTLN("Ethernet IPv6 is preferred"); break;
-    case ARDUINO_EVENT_ETH_START:               instance->DEBUG_SERIAL_PRINTLN("Ethernet started"); break;
-    case ARDUINO_EVENT_ETH_STOP:                instance->DEBUG_SERIAL_PRINTLN("Ethernet stopped"); break;
-    case ARDUINO_EVENT_ETH_CONNECTED:           instance->DEBUG_SERIAL_PRINTLN("Ethernet connected"); break;
-    case ARDUINO_EVENT_ETH_DISCONNECTED:        instance->DEBUG_SERIAL_PRINTLN("Ethernet disconnected"); break;
-    case ARDUINO_EVENT_ETH_GOT_IP:              instance->DEBUG_SERIAL_PRINTLN("Obtained IP address"); break;
+    case ARDUINO_EVENT_WIFI_STA_LOST_IP:        DEBUG_SERIAL_PRINTLN("Lost IP address and IP address is reset to 0"); break;
+    case ARDUINO_EVENT_WPS_ER_SUCCESS:          DEBUG_SERIAL_PRINTLN("WiFi Protected Setup (WPS): succeeded in enrollee mode"); break;
+    case ARDUINO_EVENT_WPS_ER_FAILED:           DEBUG_SERIAL_PRINTLN("WiFi Protected Setup (WPS): failed in enrollee mode"); break;
+    case ARDUINO_EVENT_WPS_ER_TIMEOUT:          DEBUG_SERIAL_PRINTLN("WiFi Protected Setup (WPS): timeout in enrollee mode"); break;
+    case ARDUINO_EVENT_WPS_ER_PIN:              DEBUG_SERIAL_PRINTLN("WiFi Protected Setup (WPS): pin code in enrollee mode"); break;
+    case ARDUINO_EVENT_WIFI_AP_START:           DEBUG_SERIAL_PRINTLN("WiFi access point started"); break;
+    case ARDUINO_EVENT_WIFI_AP_STOP:            DEBUG_SERIAL_PRINTLN("WiFi access point  stopped"); break;
+    case ARDUINO_EVENT_WIFI_AP_STACONNECTED:    DEBUG_SERIAL_PRINTLN("Client connected"); break;
+    case ARDUINO_EVENT_WIFI_AP_STADISCONNECTED: DEBUG_SERIAL_PRINTLN("Client disconnected"); break;
+    case ARDUINO_EVENT_WIFI_AP_STAIPASSIGNED:   DEBUG_SERIAL_PRINTLN("Assigned IP address to client"); break;
+    case ARDUINO_EVENT_WIFI_AP_PROBEREQRECVED:  DEBUG_SERIAL_PRINTLN("Received probe request"); break;
+    case ARDUINO_EVENT_WIFI_AP_GOT_IP6:         DEBUG_SERIAL_PRINTLN("AP IPv6 is preferred"); break;
+    case ARDUINO_EVENT_WIFI_STA_GOT_IP6:        DEBUG_SERIAL_PRINTLN("STA IPv6 is preferred"); break;
+    case ARDUINO_EVENT_ETH_GOT_IP6:             DEBUG_SERIAL_PRINTLN("Ethernet IPv6 is preferred"); break;
+    case ARDUINO_EVENT_ETH_START:               DEBUG_SERIAL_PRINTLN("Ethernet started"); break;
+    case ARDUINO_EVENT_ETH_STOP:                DEBUG_SERIAL_PRINTLN("Ethernet stopped"); break;
+    case ARDUINO_EVENT_ETH_CONNECTED:           DEBUG_SERIAL_PRINTLN("Ethernet connected"); break;
+    case ARDUINO_EVENT_ETH_DISCONNECTED:        DEBUG_SERIAL_PRINTLN("Ethernet disconnected"); break;
+    case ARDUINO_EVENT_ETH_GOT_IP:              DEBUG_SERIAL_PRINTLN("Obtained IP address"); break;
     default:                                    break;
   }
         delay(100);
@@ -420,13 +420,13 @@ void AirNginClient::Mqtt__Connect()
 void AirNginClient::Mqtt__OnRecieve(char *topic, uint8_t *payload, unsigned int length)
 {
   if(instance->CALL_Global_Mqtt_CALLBACK){
-    instance->DEBUG_SERIAL_PRINTLN("CALL_Global_Mqtt_CALLBACK is true");
+    DEBUG_SERIAL_PRINTLN("CALL_Global_Mqtt_CALLBACK is true");
     if (instance->onMessageCallback != nullptr) {
       instance->onMessageCallback(topic, payload, length);  // فراخوانی callback ثبت‌شده توسط کاربر
     }
     return;
   }
-    instance->DEBUG_SERIAL_PRINTLN("CALL_Global_Mqtt_CALLBACK is false");
+    DEBUG_SERIAL_PRINTLN("CALL_Global_Mqtt_CALLBACK is false");
 
 
     String projectTopic = String(topic);
@@ -438,7 +438,7 @@ void AirNginClient::Mqtt__OnRecieve(char *topic, uint8_t *payload, unsigned int 
   try
   {
     IOT__Call__Loop__MQTT();
-    instance->DEBUG_SERIAL_PRINTLN("\r\nMqtt OnRecieve  : > length : " + String(length) + " > Project/Topic: " + projectTopic);
+    DEBUG_SERIAL_PRINTLN("\r\nMqtt OnRecieve  : > length : " + String(length) + " > Project/Topic: " + projectTopic);
     //----------------------------------------------------------------------------- Cloud MqttBroker
     //.................................... Check Project
 
@@ -460,7 +460,7 @@ void AirNginClient::Mqtt__OnRecieve(char *topic, uint8_t *payload, unsigned int 
             instance->onSaveScenario(doc);
         } else if (opr == "delete_scenario" && instance->onDeleteScenario != nullptr) {
             String vcode = doc["code"].as<String>();
-            instance->DEBUG_SERIAL_PRINTLN(" Delete scenario with code : " + vcode);
+            DEBUG_SERIAL_PRINTLN(" Delete scenario with code : " + vcode);
             instance->onDeleteScenario(vcode);
         } else if (opr == "save_setting" && instance->onSaveSetting != nullptr && doc["deviceSerial"].as<String>() == instance->_SerialCloud) {
             String cmd = doc["value"].as<String>();
@@ -472,7 +472,7 @@ void AirNginClient::Mqtt__OnRecieve(char *topic, uint8_t *payload, unsigned int 
      else if (projectTopic == "ServerToDevice")
      {
        String deviceSerial = doc["deviceSerial"].as<String>();
-       instance->DEBUG_SERIAL_PRINTLN("json deviceSerial :: " + deviceSerial);
+       DEBUG_SERIAL_PRINTLN("json deviceSerial :: " + deviceSerial);
        String cmd = "";
        try
        {
@@ -531,13 +531,13 @@ void AirNginClient::Mqtt__OnRecieve(char *topic, uint8_t *payload, unsigned int 
        else if (doc["data"])
        {
          cmd = doc["data"].as<String>();
-         instance->DEBUG_SERIAL_PRINTLN("json data :: " + cmd);
+         DEBUG_SERIAL_PRINTLN("json data :: " + cmd);
          instance->Message_On_Topic_ServerToDevice_Callback(cmd);
        }
      }
      else if (projectTopic == "DeviceToDevice")
      {
-      instance->DEBUG_SERIAL_PRINTLN("command by Own-Serial > Dvc__AnalyzeData");
+      DEBUG_SERIAL_PRINTLN("command by Own-Serial > Dvc__AnalyzeData");
       instance->Message_On_Topic_DeviceToDevice_Callback(payload);
        //.................................... Extarct Data
        //  String type = doc["type"].as<String>();
@@ -683,7 +683,7 @@ void AirNginClient::IOT__WiFiStart()
 //   try
 //   {
 
-    instance->DEBUG_SERIAL_PRINTLN("Connecting to Wi-Fi...");
+    DEBUG_SERIAL_PRINTLN("Connecting to Wi-Fi...");
     instance->Tools__WifiPower(true);
     WiFi.mode(WIFI_STA);
 
@@ -693,10 +693,10 @@ void AirNginClient::IOT__WiFiStart()
     WiFi.begin(ssid, password);
     while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
-    instance->DEBUG_SERIAL_PRINTLN("Connecting...");
+    DEBUG_SERIAL_PRINTLN("Connecting...");
   }
 
-    instance->DEBUG_SERIAL_PRINTLN("***After begin Wi-Fi...");
+    DEBUG_SERIAL_PRINTLN("***After begin Wi-Fi...");
 
 //   }
 //   catch (...)
@@ -1039,7 +1039,7 @@ byte AirNginClient::MemoReadByte(int p_start)
 
 bool AirNginClient::Tools__Memory_StrSet(String key, String val)
 {
-  instance->DEBUG_SERIAL_PRINTLN("Tools__Memory_StrSet > key : " + key + " > val : " + val );
+  DEBUG_SERIAL_PRINTLN("Tools__Memory_StrSet > key : " + key + " > val : " + val );
 
   try
   {
@@ -1243,7 +1243,7 @@ String AirNginClient::Tools__Memory_StrGet(String key)
   if (checkNull && res.charAt(0) == char(255))
     res = "";
 
-  instance->DEBUG_SERIAL_PRINTLN("Tools__Memory_StrGet > key : " + key + " > val : " + res);
+  DEBUG_SERIAL_PRINTLN("Tools__Memory_StrGet > key : " + key + " > val : " + res);
 
   return res;
 }
@@ -1604,7 +1604,7 @@ bool AirNginClient::Tools__File_JSONSave(String filename, String &data)
 
 void AirNginClient::Tools__SettingRead()
 {
-  instance->DEBUG_SERIAL_PRINTLN("Setting Read... ");
+  DEBUG_SERIAL_PRINTLN("Setting Read... ");
   //...................................... Load Important Data
   instance->_Banned = (instance->MemoReadByte(EP_BANNED) == 1 ? 1 : 0);
   instance->_Configured = (instance->MemoReadByte(EP_CONFIGURED) == 1 ? 1 : 0);
@@ -1706,22 +1706,22 @@ void AirNginClient::Config__API_FirmwareUpdater()
   try {
     HTTPUpload& upload = instance->_Server.upload();
     if (upload.status == UPLOAD_FILE_START) {
-      instance->DEBUG_SERIAL_PRINTLN("Update: " + String(upload.filename.c_str()));
+      DEBUG_SERIAL_PRINTLN("Update: " + String(upload.filename.c_str()));
       if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {  //start with max available size
-        instance->DEBUG_SERIAL_PRINTLN("Update Error : Cant Begin");
+        DEBUG_SERIAL_PRINTLN("Update Error : Cant Begin");
         // Update.printError(Serial);
       }
     } else if (upload.status == UPLOAD_FILE_WRITE) {
       if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
         // Update.printError(Serial);
-        instance->DEBUG_SERIAL_PRINTLN("Update Error : Cant Write");
+        DEBUG_SERIAL_PRINTLN("Update Error : Cant Write");
       }
     } else if (upload.status == UPLOAD_FILE_END) {
       if (Update.end(true)) { 
-        instance->DEBUG_SERIAL_PRINTLN("Update Success");
+        DEBUG_SERIAL_PRINTLN("Update Success");
         instance->Tools__SetMode("config_panel", false);  // Set Powercut Restart-Point
       } else {
-        instance->DEBUG_SERIAL_PRINTLN("Update Error : Ends With Bad Status");
+        DEBUG_SERIAL_PRINTLN("Update Error : Ends With Bad Status");
         //Update.printError(Serial);
       }
     }
@@ -1734,14 +1734,14 @@ void AirNginClient::Config__API_FirmwareResult()
 {
   try
   {
-    instance->DEBUG_SERIAL_PRINTLN("***** Updating... ");
+    DEBUG_SERIAL_PRINTLN("***** Updating... ");
     //...................................................
-    instance->DEBUG_SERIAL_PRINTLN("***** Updating... ");
+    DEBUG_SERIAL_PRINTLN("***** Updating... ");
     //...................................................
     instance->_Server.sendHeader("Connection", "close");
     instance->_Server.send(200, "text/plain", (Update.hasError() ? "fail" : "ok"));
     instance->Tools__SetMode("config_panel", false);  // Set Restart-Point
-    instance->DEBUG_SERIAL_PRINTLN("Update Finish & Reboot ******");
+    DEBUG_SERIAL_PRINTLN("Update Finish & Reboot ******");
     instance->Tools__Reboot("Config__API_FirmwareResult");
   }
   catch (...){}
@@ -1753,11 +1753,11 @@ void AirNginClient::Config__API_GetSerial()
 {
   try
   {
-    instance->DEBUG_SERIAL_PRINTLN("***** Get Serial... ");
+    DEBUG_SERIAL_PRINTLN("***** Get Serial... ");
     //............................................
     instance->_Server.sendHeader("Connection", "close");
     instance->_Server.send(200, "text/plain", instance->_SerialCloud);
-    instance->DEBUG_SERIAL_PRINTLN("Get Serial OK ******");
+    DEBUG_SERIAL_PRINTLN("Get Serial OK ******");
   }
   catch (...)
   {
@@ -1772,7 +1772,7 @@ void AirNginClient::Config__API_Alive()
     return;
   //...................................................
   instance->_Server.sendHeader("Connection", "close");
-  instance->DEBUG_SERIAL_PRINTLN("HTTP Alive...");
+  DEBUG_SERIAL_PRINTLN("HTTP Alive...");
   instance->_Server.send(200, "text/html", "ok");
 }
 
@@ -1780,7 +1780,7 @@ void AirNginClient::Config__API_Alive()
 
 void AirNginClient::Config__SetJson_Network(JsonDocument doc)
 {
-  instance->DEBUG_SERIAL_PRINTLN("API-Config: Network-Save");
+  DEBUG_SERIAL_PRINTLN("API-Config: Network-Save");
   String tmp;
   JsonObject jsn = doc.as<JsonObject>();
   try
@@ -2022,7 +2022,7 @@ void AirNginClient::Config__API_Set()
 {
   if (!_ConfigPanelIsOpen)
     return;
-  instance->DEBUG_SERIAL_PRINTLN("\r\n* **** Config API-Set Recieved Data Start ******");
+  DEBUG_SERIAL_PRINTLN("\r\n* **** Config API-Set Recieved Data Start ******");
   try
   {
      instance->_Server.sendHeader("Connection", "close");
@@ -2036,7 +2036,7 @@ void AirNginClient::Config__API_Set()
   catch (...)
   {
   }
-   instance->DEBUG_SERIAL_PRINTLN("****** Config API-Set Recieved Data Finish *****");
+   DEBUG_SERIAL_PRINTLN("****** Config API-Set Recieved Data Finish *****");
   if (_NeedReboot)
     instance->Tools__Reboot("Config__API_Set");
 }
@@ -2067,7 +2067,7 @@ void AirNginClient::Config__API_Get()
 {
   try
   {
-    instance->DEBUG_SERIAL_PRINTLN("\r\n* **** API-Get ******");
+    DEBUG_SERIAL_PRINTLN("\r\n* **** API-Get ******");
     instance->_Server.sendHeader("Connection", "close");
     //.......................................................................
     instance->_ConfigTimeout = millis() + (10 * 60000); // Reset timeout for next 10 min
@@ -2147,7 +2147,7 @@ void AirNginClient::Config__API_Get()
     }
     catch (...)
     {
-      instance->DEBUG_SERIAL_PRINTLN("API-Get Error");
+      DEBUG_SERIAL_PRINTLN("API-Get Error");
       res = "{'result':'error'}";
     }
     instance->Config__ResponseJSON(res);
@@ -2156,7 +2156,7 @@ void AirNginClient::Config__API_Get()
   {
   }
 response_end:
-    instance->DEBUG_SERIAL_PRINTLN("response_end");
+    DEBUG_SERIAL_PRINTLN("response_end");
 
 //   Tools__LED_Warning(WARNINGLED_AUTO);
 }
@@ -2168,7 +2168,7 @@ void AirNginClient::Config__File_Logo()
   try
   {
     instance->_Server.send(200, "image/png", FPSTR(PROGMEM_LOGO));
-    instance->DEBUG_SERIAL_PRINTLN("Logo File Loaded");
+    DEBUG_SERIAL_PRINTLN("Logo File Loaded");
   }
   catch (...)
   {
@@ -2180,7 +2180,7 @@ void AirNginClient::Config__File_Html()
   try
   {
     // DEBUG_SERIAL_PRINTLN("\r\n***** HTTP Page Config Show-Start...\r\ntemp degree: " + Tools__ESPGetTemprature());
-    instance->DEBUG_SERIAL_PRINTLN("\r\n***** HTTP Page Config Show-Start...\r\ntemp degree: ");
+    DEBUG_SERIAL_PRINTLN("\r\n***** HTTP Page Config Show-Start...\r\ntemp degree: ");
     //...................................................
     instance->_ConfigTimeout = millis() + (10 * 60000); // Reset timeout for next 10 min
     //...................................................
@@ -2240,11 +2240,11 @@ void AirNginClient::Config__File_Html()
     //-----------------------------------------------------------------------------------------------
     instance->_Server.sendContent("");
     instance->_Server.client().stop();
-    instance->DEBUG_SERIAL_PRINTLN("HTTP Config Loaded ******");
+    DEBUG_SERIAL_PRINTLN("HTTP Config Loaded ******");
   }
   catch (...)
   {
-    instance->DEBUG_SERIAL_PRINTLN("HTTP Config Error ******");
+    DEBUG_SERIAL_PRINTLN("HTTP Config Error ******");
   }
 }
 
@@ -2396,25 +2396,25 @@ void AirNginClient::Tools__SettingSave()
 void AirNginClient::Tools__SettingShowInfo()
 {
 #if SOFTWARE_DEBUGMODE
-    instance->DEBUG_SERIAL_PRINTLN("\r\n -----------------------\r\nSetting Show Info\r\n-----------------------");
-    instance->DEBUG_SERIAL_PRINTLN("_SerialNo: " + instance->_SerialCloud);
-    instance->instance->DEBUG_SERIAL_PRINTLN("_StartMode: " + instance->_StartMode);
+    DEBUG_SERIAL_PRINTLN("\r\n -----------------------\r\nSetting Show Info\r\n-----------------------");
+    DEBUG_SERIAL_PRINTLN("_SerialNo: " + instance->_SerialCloud);
+    instance->DEBUG_SERIAL_PRINTLN("_StartMode: " + instance->_StartMode);
 
-    instance->DEBUG_SERIAL_PRINTLN("\r\n _Circuit: " + instance->_Circuit);
-    instance->DEBUG_SERIAL_PRINTLN("_Extender: " + String(instance->_Extender) + (instance->_Extender == 1 || instance->_Extender == 3 ? " / Yes" : " / No"));
-    instance->DEBUG_SERIAL_PRINTLN("_ProjectCode: " + instance->_ProjectCode);
-    instance->DEBUG_SERIAL_PRINTLN("_EncryptionKey: " + instance->_EncryptionKey);
+    DEBUG_SERIAL_PRINTLN("\r\n _Circuit: " + instance->_Circuit);
+    DEBUG_SERIAL_PRINTLN("_Extender: " + String(instance->_Extender) + (instance->_Extender == 1 || instance->_Extender == 3 ? " / Yes" : " / No"));
+    DEBUG_SERIAL_PRINTLN("_ProjectCode: " + instance->_ProjectCode);
+    DEBUG_SERIAL_PRINTLN("_EncryptionKey: " + instance->_EncryptionKey);
 
-    instance->DEBUG_SERIAL_PRINTLN("\r\n _ModemChannel: " + String(instance->_ModemChannel));
-    instance->DEBUG_SERIAL_PRINTLN("_ModemSSID: " + instance->_ModemSSID);
-    instance->DEBUG_SERIAL_PRINTLN("_ModemPass: " + instance->_ModemPass);
-    instance->DEBUG_SERIAL_PRINTLN("_ModemRSSI: " + String(instance->_ModemRSSI));
+    DEBUG_SERIAL_PRINTLN("\r\n _ModemChannel: " + String(instance->_ModemChannel));
+    DEBUG_SERIAL_PRINTLN("_ModemSSID: " + instance->_ModemSSID);
+    DEBUG_SERIAL_PRINTLN("_ModemPass: " + instance->_ModemPass);
+    DEBUG_SERIAL_PRINTLN("_ModemRSSI: " + String(instance->_ModemRSSI));
 
-    instance->DEBUG_SERIAL_PRINTLN("\r\n _MqttBroker: " + instance->_MqttBroker);
-    instance->DEBUG_SERIAL_PRINTLN("_MqttUser: " + instance->_MqttUser);
-    instance->DEBUG_SERIAL_PRINTLN("_MqttPass: " +instance-> _MqttPass);
-    instance->DEBUG_SERIAL_PRINTLN("_CloudClientId: " + instance->_CloudClientId);
-    instance->DEBUG_SERIAL_PRINTLN("");
+    DEBUG_SERIAL_PRINTLN("\r\n _MqttBroker: " + instance->_MqttBroker);
+    DEBUG_SERIAL_PRINTLN("_MqttUser: " + instance->_MqttUser);
+    DEBUG_SERIAL_PRINTLN("_MqttPass: " +instance-> _MqttPass);
+    DEBUG_SERIAL_PRINTLN("_CloudClientId: " + instance->_CloudClientId);
+    DEBUG_SERIAL_PRINTLN("");
 #endif
 }
 

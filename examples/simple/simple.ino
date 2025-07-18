@@ -1,3 +1,5 @@
+#define SOFTWARE_DEBUGMODE false
+
 #include <AirNgin.h>
 
 #define KEY_OF_CENTER "AIRN" // IT'S PRODUCER CENTER CODE

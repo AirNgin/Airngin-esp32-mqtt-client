@@ -7,19 +7,32 @@
 #define airngin_h
 
 #define SOFTWARE_VERSION "1.0.0"
-#define SOFTWARE_DEBUGMODE true
+// #define SOFTWARE_DEBUGMODE true
+
+// #if SOFTWARE_DEBUGMODE
+//   #define DEBUG_SERIAL_PRINT(x) Debug_ConsolePrint(x)
+// #else
+//   #define DEBUG_SERIAL_PRINT(x)
+// #endif
+// #if SOFTWARE_DEBUGMODE
+//   #define DEBUG_SERIAL_PRINTLN(x) Debug_ConsolePrintln(x)
+// #else
+//   #define DEBUG_SERIAL_PRINTLN(x)
+// #endif
+
+
+#ifndef SOFTWARE_DEBUGMODE
+#define SOFTWARE_DEBUGMODE true // یا 1 برای فعال
+#endif
+
 
 #if SOFTWARE_DEBUGMODE
-  #define DEBUG_SERIAL_PRINT(x) Debug_ConsolePrint(x)
-#else
-  #define DEBUG_SERIAL_PRINT(x)
-#endif
-#if SOFTWARE_DEBUGMODE
+  #define DEBUG_SERIAL_PRINT(x)   Debug_ConsolePrint(x)
   #define DEBUG_SERIAL_PRINTLN(x) Debug_ConsolePrintln(x)
 #else
+  #define DEBUG_SERIAL_PRINT(x)
   #define DEBUG_SERIAL_PRINTLN(x)
 #endif
-
 
 #define DVC_DEFAULTPASS "00000000"  // DONT CHANGE THIS
 #define SOFTWARE_DATE "1403.09.25"

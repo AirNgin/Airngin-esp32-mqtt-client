@@ -1,3 +1,5 @@
+#define SOFTWARE_DEBUGMODE false
+
 #include <AirNgin.h>
 
 #define KEY_OF_CENTER "AIRN"  // IT'S PRODUCER CENTER CODE
@@ -31,20 +33,21 @@ void MqttSend(String topic, String data) {
 
 void setup() {
 
-  airnginClient.CALL_Global_Mqtt_CALLBACK=false; // if is true just call this airnginClient.setOnMessageCallback(myMqttCallback); \
+  airnginClient.CALL_Global_Mqtt_CALLBACK = true;  // if is true just call this airnginClient.setOnMessageCallback(myMqttCallback); \
                                                  // else is false desn't call airnginClient.setOnMessageCallback(myMqttCallback); and call other callback
 
 
 
   Serial.begin(9600);
   Tools__SerialBarcodeReload();
-  airnginClient.begin("", "1.0.0", _SerialNo);
+  airnginClient.begin("AirNgin", "1.0.0", _SerialNo);
   airnginClient.setOnMessageCallback(myMqttCallback);
   airnginClient.setOnSaveScenarioCallback(saveScenarioCallback);
   airnginClient.setOnDebuggerCallback(debuggerCallback);
   airnginClient.setOnMessage_From_Topic_DeviceToDevice_Callback(message_From_Topic_DeviceToDevice_Callback);
   airnginClient.setOnMessage_From_Topic_ServerToDevice_Callback(message_From_Topic_ServerToDevice_Callback);
 
+  // Set Pin Mode
   pinMode(Pushbotton, INPUT_PULLUP);
   pinMode(Pushbutton_RELAY1, INPUT_PULLUP);
   pinMode(Pushbutton_RELAY2, INPUT_PULLUP);
@@ -58,7 +61,7 @@ void loop() {
   delay(1000);
   airnginClient.client_Loop();
   TimerSec_Refresh();  //read Time
-  if (digitalRead(Pushbutton_RELAY1) == LOW) {
+  if (digitalRead(Pushbutton_RELAY1) == LOW && digitalRead(Pushbutton_RELAY2) == LOW) {
     _TimerKeyPush += _TimerSecDef;
   } else
     _TimerKeyPush = 0;
@@ -77,15 +80,41 @@ void loop() {
     }
   }
 
+  StaticJsonDocument<4096> doc;
+
+  // ایجاد یک آرایه در JSON
+  JsonArray dataArray = doc.to<JsonArray>();
+
+  // اضافه کردن چندین آبجکت به آرایه
+
 
   if (digitalRead(Pushbutton_RELAY1) == LOW) {
     if (digitalRead(RELAY1) == LOW) {
       digitalWrite(RELAY1, HIGH);
-      MqttSend("DeviceToServer", "ch1on");
+      // JsonObject obj1 = dataArray.createNestedObject();
+      // obj1["Key"] = "ch1";
+      // obj1["Value"] = "on";
+      // // تبدیل JSON به String برای ارسال با MQTT
+      // String payload;
+      // serializeJson(doc, payload);
+
+      // // ارسال با MQTT
+      // MqttSend("DeviceToServer", payload);
+          MqttSend("DeviceToServer", "aliagha");
+
       Serial.println("relay 1 : on");
     } else {
       digitalWrite(RELAY1, LOW);
-      MqttSend("DeviceToServer", "ch1off");
+      // JsonObject obj1 = dataArray.createNestedObject();
+      // obj1["Key"] = "ch1";
+      // obj1["Value"] = "off";
+      // // تبدیل JSON به String برای ارسال با MQTT
+      // String payload;
+      // serializeJson(doc, payload);
+      // MqttSend("DeviceToServer", payload);
+      
+          MqttSend("DeviceToServer", "mohammadagha");
+
       Serial.println("relay 1 : off");
     }
   }
@@ -93,11 +122,26 @@ void loop() {
   if (digitalRead(Pushbutton_RELAY2) == LOW) {
     if (digitalRead(RELAY2) == LOW) {
       digitalWrite(RELAY2, HIGH);
-      MqttSend("DeviceToServer", "ch2on");
+      // JsonObject obj1 = dataArray.createNestedObject();
+      // obj1["Key"] = "ch2";
+      // obj1["Value"] = "on";
+      // // تبدیل JSON به String برای ارسال با MQTT
+      // String payload;
+      // serializeJson(doc, payload);
+      // MqttSend("DeviceToServer", payload);
+          MqttSend("DeviceToServer", "ch2on");
+
       Serial.println("relay 2 : on");
     } else {
       digitalWrite(RELAY2, LOW);
-      MqttSend("DeviceToServer", "ch2off");
+      // JsonObject obj1 = dataArray.createNestedObject();
+      // obj1["Key"] = "ch2";
+      // obj1["Value"] = "off";
+      // // تبدیل JSON به String برای ارسال با MQTT
+      // String payload;
+      // serializeJson(doc, payload);
+      // MqttSend("DeviceToServer", payload);
+       MqttSend("DeviceToServer", "ch2off");
       Serial.println("relay 2 : off");
     }
   }
@@ -162,27 +206,7 @@ void myMqttCallback(char *topic, uint8_t *payload, unsigned int length) {
     return;
   }
 
-  if (projectTopic == "DeviceSetting") {
-    String opr = doc["operationName"].as<String>();
-    if (opr == "save_scenario" || opr == "delete_scenario") {
-      // کد مربوط به ذخیره یا حذف سناریو
-    } else if (opr == "save_setting") {
-      if (doc["deviceSerial"].as<String>() == airnginClient._SerialCloud) {
-        String cmd, d = doc["value"].as<String>();
-        if (d != "") {
-          deserializeJson(doc, d);
-          if (doc["request"]["commandName"] && doc["request"]["commandData"]) {
-            cmd = doc["request"]["commandName"].as<String>();
-            if (cmd == "saveScenarioOperation") {
-              JsonVariant inp = doc["scenarioOperation"].as<JsonVariant>();
-              // پردازش سناریو
-            }
-            // سایر دستورات...
-          }
-        }
-      }
-    }
-  } else if (projectTopic == "ServerToDevice") {  // اگر داده ارسالی از سمت سرور باشد
+  if (projectTopic == "ServerToDevice") {  // اگر داده ارسالی از سمت سرور باشد
 
     // خروجی ما بصورت زیر است
     //{"data":"{\"type\":\"command\",\"value\":\"ch2on\"}","deviceSerial":"AIRN0001208520"}
@@ -193,64 +217,106 @@ void myMqttCallback(char *topic, uint8_t *payload, unsigned int length) {
 
     // اسختراج سریال ابزاری که سرور برای آن داده را ارسال کرده ، جهت اینکه بدانید برای کدام ابزار است و با سریال خودتان در ادامه قیاس نمایید.
     String deviceSerial = doc["deviceSerial"].as<String>();
-    String cmd = "";
+    String operationName = "";
 
-    if (doc["operationName"]) cmd = doc["operationName"].as<String>();
-
-    if (cmd == "firmware_update") {
-
-      String value = doc["value"].as<String>();
-      if (value != "") {
-        doc.clear();
-        deserializeJson(doc, value);
-        Serial.println(" link > " + doc["link"].as<String>());
-        Serial.println(" cert > " + doc["cert"].as<String>());
-        Serial.println(" utc > " + doc["utc"].as<String>());
-        airnginClient.IOT__FirmwareUpdate(doc["link"].as<String>(), doc["cert"].as<String>(), doc["utc"].as<String>());
-      }
-    }  // پس نیاز است ابتدا json خودمان را
-       // از json درون data
-       // استخراج نماییم و سپس json خودمان را
-
-    else if ((doc["data"])) {
+    if ((doc["data"])) {
 
       if (deviceSerial == airnginClient._SerialCloud) {  // مطمین شویم که این داده برای ما ارسال شده است.
 
-        cmd = doc["data"].as<String>();  // اگر دیتا داشت چون خروجی فایل جاوااسکریپت ما هم یک json بوده
-                                         // تشکیل یک json در json داده ایم
-        if (cmd != "") {
+        operationName = doc["data"].as<String>();  // اگر دیتا داشت چون خروجی فایل جاوااسکریپت ما هم یک json بوده
+                                                   // تشکیل یک json در json داده ایم
 
+        if (operationName == "mohammadagha") {
+          digitalWrite(RELAY1, LOW);
+          Serial.println(" with command from server  >  Relay 1 : OFF");
+          MqttSend("DeviceToServer", operationName);
 
-          doc.clear();
-          deserializeJson(doc, cmd);
-          String type = doc["type"].as<String>();
-          String value = doc["value"].as<String>();
-          if (doc["operationName"]) cmd = doc["operationName"].as<String>();
+        } else if (operationName == "aliagha") {
+          digitalWrite(RELAY1, HIGH);
+          MqttSend("DeviceToServer", operationName);
 
-          Serial.println(" type > " + type);
-          Serial.println(" value > " + value);
-          Serial.println(" cmd > " + cmd);
+          Serial.println(" with command from server  >  Relay 1 : ON");
+        } else if (operationName == "ch2off") {
+          digitalWrite(RELAY2, LOW);
+          Serial.println(" with command from server  >  Relay 2 : OFF");
+          MqttSend("DeviceToServer", operationName);
 
-          if (type == "command") {
-            if (value == "ch1on") {
-              digitalWrite(RELAY1, HIGH);
-              Serial.println(" with command from server  >  Relay 1 : on");
-
-            } else if (value == "ch1off") {
-              digitalWrite(RELAY1, LOW);
-              Serial.println(" with command from server  >  Relay 1 : OFF");
-
-            } else if (value == "ch2on") {
-              digitalWrite(RELAY2, HIGH);
-              Serial.println(" with command from server  >  Relay 2 : on");
-
-            } else if (value == "ch2off") {
-              digitalWrite(RELAY2, LOW);
-              Serial.println(" with command from server  >  Relay 2 : OFF");
-            }
-            MqttSend("DeviceToServer", value);  // حتما تغییرات را برای ثبت در سرور و ایجاد تغییر در اپلیکیشن ها به سمت سرور ارسال می نماییم.
-          }
+        } else if (operationName == "ch2on") {
+          digitalWrite(RELAY2, HIGH);
+          MqttSend("DeviceToServer", operationName);
+          Serial.println(" with command from server  >  Relay 2 : ON");
         }
+        // if (operationName != "") {
+
+
+
+        // doc.clear();
+        // deserializeJson(doc, operationName);
+        // // String type = doc["type"].as<String>();
+        // String value = doc["value"].as<String>();
+        // if (doc["key"]) operationName = doc["key"].as<String>();
+
+        // // Serial.println(" type > " + type);
+        // Serial.println(" value > " + value);
+        // Serial.println(" operationName > " + operationName);
+        // if (operationName == "ch1") {
+        //   if (value == "on") {
+        //     digitalWrite(RELAY1, HIGH);
+        //     Serial.println(" with command from server  >  Relay 1 : on");
+        //   } else {
+        //     digitalWrite(RELAY1, LOW);
+        //     Serial.println(" with command from server  >  Relay 1 : OFF");
+        //   }
+        // } else if (operationName == "ch2") {
+        //   if (value == "on") {
+        //     digitalWrite(RELAY2, HIGH);
+        //     Serial.println(" with command from server  >  Relay 2 : on");
+        //   } else {
+        //     digitalWrite(RELAY2, LOW);
+        //     Serial.println(" with command from server  >  Relay 2 : OFF");
+        //   }
+        // }
+
+
+        // StaticJsonDocument<4096> doc;
+
+        // // ایجاد یک آرایه در JSON
+        // JsonArray dataArray = doc.to<JsonArray>();
+
+        // // اضافه کردن چندین آبجکت به آرایه
+        // JsonObject obj1 = dataArray.createNestedObject();
+        // obj1["Key"] = operationName;
+        // obj1["Value"] = value;
+
+
+        // // تبدیل JSON به String برای ارسال با MQTT
+        // String payload;
+        // serializeJson(doc, payload);
+
+        // // ارسال با MQTT
+        // MqttSend("DeviceToServer", payload);
+
+
+        // if (type == "command") {
+        //   if (value == "ch1on") {
+        //     digitalWrite(RELAY1, HIGH);
+        //     Serial.println(" with command from server  >  Relay 1 : on");
+
+        //   } else if (value == "ch1off") {
+        //     digitalWrite(RELAY1, LOW);
+        //     Serial.println(" with command from server  >  Relay 1 : OFF");
+
+        //   } else if (value == "ch2on") {
+        //     digitalWrite(RELAY2, HIGH);
+        //     Serial.println(" with command from server  >  Relay 2 : on");
+
+        //   } else if (value == "ch2off") {
+        //     digitalWrite(RELAY2, LOW);
+        //     Serial.println(" with command from server  >  Relay 2 : OFF");
+        //   }
+        //   MqttSend("DeviceToServer", value);  // حتما تغییرات را برای ثبت در سرور و ایجاد تغییر در اپلیکیشن ها به سمت سرور ارسال می نماییم.
+        // }
+        //}
       }
     }
   } else if (projectTopic == "Time/Tehran") {
