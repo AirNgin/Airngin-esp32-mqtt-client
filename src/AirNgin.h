@@ -1,25 +1,12 @@
 /*
  airngin.h - A simple client for Connect To AirNgin Broker.
-  AirNgin VERSION : 0.1.0 Beta
+  AirNgin VERSION : 0.1.9 Beta
   https://airngin.com
 */
 #ifndef airngin_h
 #define airngin_h
 
 #define SOFTWARE_VERSION "1.0.0"
-// #define SOFTWARE_DEBUGMODE true
-
-// #if SOFTWARE_DEBUGMODE
-//   #define DEBUG_SERIAL_PRINT(x) Debug_ConsolePrint(x)
-// #else
-//   #define DEBUG_SERIAL_PRINT(x)
-// #endif
-// #if SOFTWARE_DEBUGMODE
-//   #define DEBUG_SERIAL_PRINTLN(x) Debug_ConsolePrintln(x)
-// #else
-//   #define DEBUG_SERIAL_PRINTLN(x)
-// #endif
-
 
 #ifndef SOFTWARE_DEBUGMODE
 #define SOFTWARE_DEBUGMODE true // یا 1 برای فعال
