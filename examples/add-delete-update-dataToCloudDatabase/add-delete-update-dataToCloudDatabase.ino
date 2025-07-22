@@ -1,5 +1,3 @@
-#define SOFTWARE_DEBUGMODE false
-
 #include <AirNgin.h>
 
 #define KEY_OF_CENTER "AIRN"  // IT'S PRODUCER CENTER CODE
@@ -29,9 +27,11 @@ void setup() {
   airnginClient.CALL_Global_Mqtt_CALLBACK=false; // if is true just call this airnginClient.setOnMessageCallback(myMqttCallback); \
                                                  // else is false desn't call airnginClient.setOnMessageCallback(myMqttCallback); and call other callback
 
+  bool isDebugEnabled = true; // if you want disable serial print in liberary false this
+
   Serial.begin(9600);
   Tools__SerialBarcodeReload();
-  airnginClient.begin("", "", _SerialNo);
+  airnginClient.begin("AirNgin", "1.0.0", _SerialNo,isDebugEnabled);
   airnginClient.setOnMessageCallback(myMqttCallback);
   airnginClient.setOnSaveScenarioCallback(saveScenarioCallback);
   airnginClient.setOnDebuggerCallback(debuggerCallback);

@@ -1,6 +1,7 @@
+#pragma once
 /*
  airngin.h - A simple client for Connect To AirNgin Broker.
-  AirNgin VERSION : 0.1.9 Beta
+  AirNgin VERSION : 0.1.11 Beta
   https://airngin.com
 */
 #ifndef airngin_h
@@ -8,21 +9,8 @@
 
 #define SOFTWARE_VERSION "1.0.0"
 
-#ifndef SOFTWARE_DEBUGMODE
-#define SOFTWARE_DEBUGMODE true // یا 1 برای فعال
-#endif
-
-
-#if SOFTWARE_DEBUGMODE
-  #define DEBUG_SERIAL_PRINT(x)   Debug_ConsolePrint(x)
-  #define DEBUG_SERIAL_PRINTLN(x) Debug_ConsolePrintln(x)
-#else
-  #define DEBUG_SERIAL_PRINT(x)
-  #define DEBUG_SERIAL_PRINTLN(x)
-#endif
-
 #define DVC_DEFAULTPASS "00000000"  // DONT CHANGE THIS
-#define SOFTWARE_DATE "1403.09.25"
+#define SOFTWARE_DATE "1404.04.31"
 
 
 
@@ -374,7 +362,7 @@ public:
     bool addDataToCloud(String key, String value);
     String getDataFromCloud(String key);
     bool deleteDataFromCloud(String key);
-    void begin(String name_of_brand="", String version_of_brand="", String serial_of_device="");
+    void begin(String name_of_brand="", String version_of_brand="", String serial_of_device="",bool isDebugEnabled=false);
     void Config__Setup();
     void client_Loop();
     void Mqtt_Send(String scope, String type, String data, String sender, bool offlineSupport=false);
@@ -446,6 +434,7 @@ public:
     bool _WiFi_ConnectWorking;
     bool _MqttCon_IsConnected;
     bool CALL_Global_Mqtt_CALLBACK=false;
+    bool isDebugEnabled = false;
 
 
 };

@@ -1,4 +1,4 @@
-# AirNgin ESP32 MQTT Client v0.1.9 / Arduino.cc Library
+# AirNgin ESP32 MQTT Client v0.1.11 / Arduino.cc Library
 **Arduino Library for Client Connection to the AirNgin Broker**
 
 ورژن 0.1.2 دارای متدهای ارتباط با پایگاه داده ابری می باشد که به شما قابلیت افزودن، بروز رسانی و حذف رکوردها به شما می دهد.
@@ -8,11 +8,11 @@
 ---
 
 ## نکته :
-برای غیر فعال سازی حالت دیباگ و جلوگیری از پرینت لاگ ها کافی است بعد از خط افزودن کتابخانه کد زیر را اضافه نمایید.
+برای غیر فعال سازی حالت دیباگ و جلوگیری از پرینت لاگ ها کافی است مقدار متغییر زیر در setup را false نمایید.
 
-#define SOFTWARE_DEBUGMODE false
+bool isDebugEnabled = true;
 
-## نکته :
+## نکته بسیار مهم:
 از منوی Tools > Partition schema > minimal SPIFFS قرار دهید تا حافظه با حجم درست تنظیم شود.
 
 
